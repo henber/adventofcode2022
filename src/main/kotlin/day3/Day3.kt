@@ -3,7 +3,7 @@ package day3
 import readInput
 
 val alphabet = ('a'..'z').joinToString(separator = "") { "$it" }
-val packItems = (alphabet + alphabet.uppercase()).mapIndexed { index, c ->
+val itemPriorityMap = (alphabet + alphabet.uppercase()).mapIndexed { index, c ->
     Pair(c, index + 1)
 }.toMap()
 
@@ -16,7 +16,7 @@ val input = readInput("day3.txt")
 fun solveA(): Long {
     return input.map {
         it.first.intersect(it.second).first()
-    }.mapNotNull { packItems[it] }.sum().toLong()
+    }.mapNotNull { itemPriorityMap[it] }.sum().toLong()
 }
 
 fun solveB(): Long {
@@ -28,7 +28,7 @@ fun solveB(): Long {
         .map {
             (it[0] intersect it[1] intersect it[2]).first()
         }
-        .mapNotNull { packItems[it] }
+        .mapNotNull { itemPriorityMap[it] }
         .sum().toLong()
 }
 
