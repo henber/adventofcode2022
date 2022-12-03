@@ -9,8 +9,9 @@ val itemPriorityMap = (alphabet + alphabet.uppercase()).mapIndexed { index, c ->
 
 val input = readInput("day3.txt")
     .map {
-        Pair(it.subSequence(0, it.length / 2).toSet(),
-            it.subSequence(it.length / 2, it.length).toSet())
+        val compartments = it.chunked(it.length / 2)
+            .map { it.toSet() }
+        Pair(compartments[0], compartments[1])
     }
 
 fun solveA(): Long {
