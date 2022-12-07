@@ -81,18 +81,15 @@ fun createFilesAndFolders(subInstructions: List<String>, currentFolder: Folder) 
         }
 }
 
-fun solveA(): Long {
-    val inputQueue = ArrayDeque(input.drop(1))
-    val root = buildDirectoryStructure(inputQueue)
+val inputQueue = ArrayDeque(input.drop(1))
+val root = buildDirectoryStructure(inputQueue)
 
+fun solveA(): Long {
     return root.allDirSizes().filter { it.second <= 100000 }
         .sumOf { it.second }
 }
 
 fun solveB(): Long {
-    val inputQueue = ArrayDeque(input.drop(1))
-    val root = buildDirectoryStructure(inputQueue)
-
     val totalSpace = 70000000
     val neededSpace = 30000000
     val currentFreeSpace = totalSpace - root.size()
