@@ -101,8 +101,7 @@ fun solveB(): Long {
     val needToDelete = neededSpace - currentFreeSpace
 
     return root.allDirSizes().filter { it.second >= needToDelete }
-        .sortedBy { it.second }
-        .first().second
+        .minByOrNull { it.second }!!.second
 }
 
 fun main() {
