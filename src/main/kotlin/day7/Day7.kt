@@ -1,8 +1,6 @@
 package day7
 
 import readInput
-import java.util.Deque
-import kotlin.contracts.contract
 
 val input = readInput("day7.txt")
 
