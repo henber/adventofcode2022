@@ -2,6 +2,7 @@ import java.io.File
 import java.lang.Integer.max
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.ArrayDeque
 import kotlin.math.min
 
 fun readInput(fileName: String): List<String>
@@ -138,4 +139,35 @@ fun <T> printMatrix(matrix: List<List<T>>) {
         println(it.joinToString(separator = "") { it.toString() })
     }
     println()
+}
+
+
+class BFS {
+    class Edge<C>(val coordinate: C)
+}
+fun <C, V> bfs(target: V, root: C, getEdges: (C) -> List<BFS.Edge<C>>, getValue: (C) -> V): List<C> {
+    val queue = ArrayDeque <Pair<BFS.Edge<C>, List<C>>>()
+    val visited = mutableSetOf(root)
+    queue.add(Pair(BFS.Edge(root), listOf(root)))
+
+    while (queue.isNotEmpty()) {
+
+        val current = queue.removeFirst()
+        if (getValue(current.first.coordinate) == target) {
+            return current.second
+        }
+
+        getEdges(current.first.coordinate).forEach {
+            if (!visited.contains(it.coordinate)) {
+                visited.add(it.coordinate)
+                queue.add(Pair(BFS.Edge(it.coordinate), current.second + listOf(it.coordinate)))
+            }
+        }
+
+        if (queue.isEmpty()) {
+            println(current)
+        }
+    }
+
+    return emptyList()
 }
