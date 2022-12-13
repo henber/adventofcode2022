@@ -108,7 +108,7 @@ fun solveB(): Long {
             Pair(index + 1, composite.toString())
         }
         .filter { it.second == "[[2]]" || it.second == "[[6]]" }
-        .map { it.first }.toList()
+        .map { it.first }
         .product()
 }
 
