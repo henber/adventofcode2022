@@ -44,15 +44,18 @@ fun extendedEuclid(a: Long, b: Long): LongArray {
  * Find the product of all the numbers in the list
  */
 fun <E : Number> List<E>.product(): Long {
-    if (this.isEmpty()) {
-        return 0L
+    return this.fold(0L) { acc, e ->
+        if (acc == 0L ) e.toLong()
+        else acc * e.toLong()
     }
-    var product = 1L
-    for (numb in this) {
-        when (numb) {
-            is Long -> product *= numb
-            is Int -> product *= numb
-        }
+}
+
+/**
+ * Find the product of all the numbers in the list
+ */
+fun <E : Number> Sequence<E>.product(): Long {
+    return this.fold(0L) { acc, e ->
+        if (acc == 0L ) e.toLong()
+        else acc * e.toLong()
     }
-    return product
 }
