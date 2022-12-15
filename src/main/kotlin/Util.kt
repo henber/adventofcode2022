@@ -3,6 +3,7 @@ import java.lang.Integer.max
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.ArrayDeque
+import kotlin.math.abs
 import kotlin.math.min
 
 fun readInput(fileName: String): List<String>
@@ -32,6 +33,8 @@ data class Pos(val x: Int, val y: Int): Comparable<Pos> {
 
     override fun toString(): String = "($x $y)"
 }
+
+fun manhattanDist(pos1: Pos, pos2: Pos): Int = abs(pos1.x - pos2.x) + abs(pos1.y - pos2.y)
 
 fun <T> List<T>.listPartition(predicate: (T) -> Boolean): List<List<T>> =
     listPartition(list = this, predicate = predicate)
