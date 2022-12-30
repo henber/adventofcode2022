@@ -12,7 +12,7 @@ fun readInput(fileName: String): List<String>
 fun readInputText(fileName: String): String
     = File("src/main/resources/$fileName").readText()
 
-tailrec fun <T> listPartition(list: List<T>, result: MutableList<List<T>> = mutableListOf(), predicate: (T) -> Boolean): List<List<T>> {
+tailrec fun <T> listPartition(list: List<T>, result: MutableList<List<T>> = mutableListOf(), includeSplitterAsPartition: Boolean = false, predicate: (T) -> Boolean): List<List<T>> {
     val partition = list.takeWhile(predicate)
 
     if (list.isEmpty()) {
@@ -23,7 +23,11 @@ tailrec fun <T> listPartition(list: List<T>, result: MutableList<List<T>> = muta
         result.add(partition)
     }
 
-    return listPartition(list.drop(partition.size + 1), result, predicate)
+    if (includeSplitterAsPartition) {
+        result.add(list.drop(partition.size).take(1))
+    }
+
+    return listPartition(list.drop(partition.size + 1), result, includeSplitterAsPartition, predicate)
 }
 
 data class Pos(val x: Int, val y: Int): Comparable<Pos> {
@@ -34,10 +38,20 @@ data class Pos(val x: Int, val y: Int): Comparable<Pos> {
     override fun toString(): String = "($x $y)"
 }
 
+data class Pos3(val x: Int, val y: Int, val z: Int): Comparable<Pos3> {
+    operator fun plus(other: Pos3) = Pos3(this.x + other.x, this.y + other.y, this.z + other.z)
+
+    override fun compareTo(other: Pos3): Int = toString().compareTo(other.toString())
+
+    override fun toString(): String = "($x $y $z)"
+}
+
 fun manhattanDist(pos1: Pos, pos2: Pos): Int = abs(pos1.x - pos2.x) + abs(pos1.y - pos2.y)
 
-fun <T> List<T>.listPartition(predicate: (T) -> Boolean): List<List<T>> =
-    listPartition(list = this, predicate = predicate)
+fun manhattanDist(pos1: Pos3, pos2: Pos3): Int = abs(pos1.x - pos2.x) + abs(pos1.y - pos2.y) + abs(pos1.z - pos2.z)
+
+fun <T> List<T>.listPartition(includeSplitterAsPartition: Boolean = false, predicate: (T) -> Boolean): List<List<T>> =
+    listPartition(list = this, includeSplitterAsPartition = includeSplitterAsPartition, predicate = predicate)
 
 fun <E> List<List<E>>.transpose(): List<List<E>> {
     if (isEmpty()) return this
@@ -148,7 +162,12 @@ fun <T> printMatrix(matrix: List<List<T>>) {
 class BFS {
     class Edge<C>(val coordinate: C)
 }
-fun <C, V> bfs(target: V, root: C, getEdges: (C) -> List<BFS.Edge<C>>, getValue: (C) -> V): List<C> {
+fun <C, V> bfs(target: V, root: C, getEdges: (C) -> Collection<BFS.Edge<C>>, getValue: (C) -> V): List<C> {
+    return bfs(target = target, root = root, duplicatesAllowed = false, getEdges =
+    {c, cs -> getEdges(c) }, getValue = getValue)
+}
+
+fun <C, V> bfs(target: V, root: C, duplicatesAllowed: Boolean, getEdges: (C, List<C>) -> Collection<BFS.Edge<C>>, getValue: (C) -> V): List<C> {
     val queue = ArrayDeque <Pair<BFS.Edge<C>, List<C>>>()
     val visited = mutableSetOf(root)
     queue.add(Pair(BFS.Edge(root), listOf(root)))
@@ -160,15 +179,39 @@ fun <C, V> bfs(target: V, root: C, getEdges: (C) -> List<BFS.Edge<C>>, getValue:
             return current.second
         }
 
-        getEdges(current.first.coordinate).forEach {
-            if (!visited.contains(it.coordinate)) {
+        getEdges(current.first.coordinate, current.second).forEach {
+            if (duplicatesAllowed || !visited.contains(it.coordinate)) {
                 visited.add(it.coordinate)
                 queue.add(Pair(BFS.Edge(it.coordinate), current.second + listOf(it.coordinate)))
             }
         }
+    }
 
-        if (queue.isEmpty()) {
-            println(current)
+    return emptyList()
+}
+
+fun <C, V> dfs(target: V, root: C, getEdges: (C) -> Collection<BFS.Edge<C>>, getValue: (C) -> V): List<C> {
+    return bfs(target = target, root = root, duplicatesAllowed = false, getEdges =
+    {c, cs -> getEdges(c) }, getValue = getValue)
+}
+
+fun <C, V> dfs(target: V, root: C, duplicatesAllowed: Boolean, getEdges: (C, List<C>) -> Collection<BFS.Edge<C>>, getValue: (C) -> V): List<C> {
+    val stack = ArrayDeque <Pair<BFS.Edge<C>, List<C>>>()
+    val visited = mutableSetOf(root)
+    stack.add(Pair(BFS.Edge(root), listOf(root)))
+
+    while (stack.isNotEmpty()) {
+
+        val current = stack.removeLast()
+        if (getValue(current.first.coordinate) == target) {
+            return current.second
+        }
+
+        getEdges(current.first.coordinate, current.second).forEach {
+            if (duplicatesAllowed || !visited.contains(it.coordinate)) {
+                visited.add(it.coordinate)
+                stack.add(Pair(BFS.Edge(it.coordinate), current.second + listOf(it.coordinate)))
+            }
         }
     }
 
